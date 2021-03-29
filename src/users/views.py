@@ -1,7 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-
+from rest_framework.renderers import TemplateHTMLRenderer
+from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render,redirect
 import requests
 
 from .serializers import CreateUserSerializer
@@ -15,9 +18,25 @@ IP_token = 'http://10.61.64.58:8000/o/token/'
 IP_revoke_token = 'http://10.61.64.58:8000/o/revoke_token/'
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+""" @api_view(['POST']) 
+@permission_classes([AllowAny])""" 
 def register(request):
+
+    if request.method == 'POST':
+        f = UserCreationForm(request.POST)
+        if f.is_valid():
+            f.save()
+            messages.success(request, 'Account created successfully')
+            return redirect('/')
+
+    else:
+        f = UserCreationForm()
+
+    return render(request, 'registration/signup.html', {'form': f})
+
+
+    
+""" 
     '''
     Registers user to the server. Input should be in the format:
     {"username": "username", "password": "1234abcd"}
@@ -41,7 +60,7 @@ def register(request):
                           )
         return Response(r.json())
     return Response(serializer.errors)
-
+ """
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

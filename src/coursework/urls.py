@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('piazza.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('authentication/', include('users.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

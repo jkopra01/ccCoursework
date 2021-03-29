@@ -1,0 +1,10 @@
+{% block content %}
+  <h2>Register</h2>
+  <form method="post">
+    {% csrf_token %}
+  {{form.as_table }}
+    <br>
+    <a href="/"><button type="button">Cancel</button></a>
+    <input type="submit" value="Save"/>
+  </form>
+{% endblock %}
