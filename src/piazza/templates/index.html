@@ -11,5 +11,23 @@ Hello and Welcome to the Piazza!
 {% else %}
 <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
 {% endif %} 
+
+
+<div class="post">
+    <ul>
+      {% for post in latest_post_list %}
+      <div class= "individualPost" style="border: thin solid black">
+      <div class="topPart"><p>ID:{{post.id}} by {{ post.poster }} at {{ post.timestamp }}<p></div>
+      <section><div class="postTitle">{{ post.title }}</div>
+        <p>{{post.body}}</p>
+        <div class="lowerPart"><p>Likes:{{post.likes}}  Dislikes:{{post.dislikes}}  Status:{{post.status}}  Expire time:{{ post.extimestamp }}<p></div>
+        </section>
+    </div>
+    <br>
+      {% endfor %}
+    </ul>
+  
+  </div>
+
 </body>
 </html>
