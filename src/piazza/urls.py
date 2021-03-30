@@ -7,5 +7,6 @@ router.register(r'posts', views.PostViewSet)
 
 urlpatterns = [
  path('', views.start, name='piazza'),
+ path('createpost/', views.createPost, name='createPost'),
 ]
 
