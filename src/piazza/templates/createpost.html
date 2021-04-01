@@ -2,12 +2,7 @@
     <h2>Create post</h2>
     <form method="post">
       {% csrf_token %}
-      <th><label for="title">Title:</label></th>
-      {{form.title}}
-      <br>
-      <th><label for="body">Post:</label></th>
-      {{form.body}}
-      <br>
+      {{ form.as_p }}
       <a href="/"><button type="button">Cancel</button></a>
       <input type="submit" value="Save"/>
     </form>

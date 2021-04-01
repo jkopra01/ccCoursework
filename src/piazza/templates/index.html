@@ -18,9 +18,10 @@ Hello and Welcome to the Piazza!
     <ul>
       {% for post in latest_post_list %}
       <div class= "individualPost" style="border: thin solid black">
-      <div class="topPart"><p>ID:{{post.id}} by {{ post.poster }} at {{ post.timestamp }}<p></div>
+      <div class="topPart"><p>ID:{{post.id}}  Category: {{post.topics}} by {{ post.poster }} at {{ post.timestamp }}<p></div>
       <section><div class="postTitle">{{ post.title }}</div>
         <p>{{post.body}}</p>
+        {% for topic in post.topics.all %} <br/>{{topic.name}}<br/>{% endfor %}
         <div class="lowerPart"><p>Likes:{{post.likes}}  Dislikes:{{post.dislikes}}  Status:{{post.status}}  Expire time:{{ post.extimestamp }}<p></div>
         </section>
     </div>

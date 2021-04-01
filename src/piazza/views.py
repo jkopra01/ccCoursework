@@ -2,7 +2,8 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.utils import timezone
-from datetime import timedelta
+from django.template import RequestContext
+from datetime import timedelta,datetime
 from rest_framework import viewsets
 from .serializers import PostSerializer
 from .models import Post
@@ -36,23 +37,48 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 
-@login_required()
+
 def createPost(request):
     if request.method == "POST":
-        form = CreatePost(request.POST, initial={'status': True})
+        form = CreatePost(request.POST)
         if form.is_valid():
-            form.likes = 0
-            form.dislikes = 0
-            form.timestamp = timezone.now()
-            form.extimestamp = timezone.now() + timedelta(1)
-            form.poster = request.user
-            form.status = True
-            form.save()
+            post = form.save(commit=False)
+            post.poster = request.user
+            post.save()
+           # post.topics.set(form.cleaned_data.get("topics"))
+            form.save_m2m() 
+            #post.save()
+            
             return redirect('/')
     else:
         form = CreatePost()
     return render(request, 'createpost.html', {'form': form})
 
+
+
+
+""" 
+@login_required()
+def createPost(request):
+    if request.method == "POST":
+        form = CreatePost(request.POST)
+        f = TopicForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            t = f.save(commit=False)
+            post.poster = request.user
+            
+            post.save()
+            t.save()
+            f.save_m2m()
+            post.topics.set(f.cleaned_data.get("name"))
+            post.save()
+            return redirect('/')
+    else:
+        form = CreatePost()
+        f = TopicForm()
+    return render(request, 'createpost.html', {'form': form,'f':f})
+ """
 
 
 """ @login_required()
