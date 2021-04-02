@@ -6,7 +6,7 @@ from django.template import RequestContext
 from datetime import timedelta,datetime
 from rest_framework import viewsets
 from .serializers import PostSerializer
-from .models import Post
+from .models import Post,Topic
 from .forms import CreatePost
 
 
@@ -43,10 +43,15 @@ def createPost(request):
         form = CreatePost(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
+           # ff = f.save(commit=False)
             post.poster = request.user
+            
             post.save()
-           # post.topics.set(form.cleaned_data.get("topics"))
+         
+            #post.topics.set(topic_obj)
             form.save_m2m() 
+          #  post.topics.set = form.cleaned_data['topics']
+           # post.save()
             #post.save()
             
             return redirect('/')

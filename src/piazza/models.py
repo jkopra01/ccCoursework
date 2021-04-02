@@ -26,6 +26,19 @@ class Topic(models.Model):
     def __str__(self):
         return self.name
 
+check_empty_obj = Topic.objects.all()
+if not check_empty_obj:
+    record = Topic(name="Sports")
+    record.save()
+    record = Topic(name="Politics")
+    record.save()
+    record = Topic(name="Tech")
+    record.save()
+    record = Topic(name="Health")
+    record.save()
+
+
+
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
     poster = models.CharField(max_length=60)
