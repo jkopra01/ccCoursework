@@ -3,41 +3,24 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from django.utils import timezone
 
-
-OPTIONS = (
-        ("Sports", "Sports"),
-        ("Politics", "Politics"),
-        ("Tech", "Tech"),
-        ("Health", "Health"),
-        )
-
 #Gets the default expiry date of one day
 def getDefaultExDate():
   return timezone.now() + timedelta(days=1)
 
 class Topic(models.Model):
-    OPTIONS = (
-        ("Sports", "Sports"),
-        ("Politics", "Politics"),
-        ("Tech", "Tech"),
-        ("Health", "Health"),
-        )
     name = models.CharField(max_length=30)
     def __str__(self):
         return self.name
 
+#Creates topics if the they dont exist yet
 check_empty_obj = Topic.objects.all()
 if not check_empty_obj:
-    record = Topic(name="Sports")
-    record.save()
-    record = Topic(name="Politics")
-    record.save()
-    record = Topic(name="Tech")
-    record.save()
-    record = Topic(name="Health")
-    record.save()
-
-
+    Topic.objects.bulk_create(
+    [Topic(name="Sports"),
+     Topic(name="Politics"),
+     Topic(name="Tech"),
+     Topic(name="Health")]
+)
 
 class Post(models.Model):
     id = models.AutoField(primary_key=True)

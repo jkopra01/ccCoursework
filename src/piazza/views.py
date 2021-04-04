@@ -37,66 +37,16 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 
-
+#creates post and saves many to many relationship
 def createPost(request):
     if request.method == "POST":
         form = CreatePost(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
-           # ff = f.save(commit=False)
             post.poster = request.user
-            
             post.save()
-         
-            #post.topics.set(topic_obj)
             form.save_m2m() 
-          #  post.topics.set = form.cleaned_data['topics']
-           # post.save()
-            #post.save()
-            
             return redirect('/')
     else:
         form = CreatePost()
     return render(request, 'createpost.html', {'form': form})
-
-
-
-
-""" 
-@login_required()
-def createPost(request):
-    if request.method == "POST":
-        form = CreatePost(request.POST)
-        f = TopicForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            t = f.save(commit=False)
-            post.poster = request.user
-            
-            post.save()
-            t.save()
-            f.save_m2m()
-            post.topics.set(f.cleaned_data.get("name"))
-            post.save()
-            return redirect('/')
-    else:
-        form = CreatePost()
-        f = TopicForm()
-    return render(request, 'createpost.html', {'form': form,'f':f})
- """
-
-
-""" @login_required()
-def createPost(request):
-    user = request.user
-    form = CreatePost(request.POST)
-    if request.method == 'POST':
-        if form.is_valid():
-            sender = user
-            title = form.cleaned_data.get("title")
-            b = CreatePost.objects.create(title=title)
-            b.save()
-            return redirect('/')
-    else:
-        form = Post()
-    return render(request, 'createpost.html', {'form': form}) """
