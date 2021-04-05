@@ -36,10 +36,31 @@ Hello and Welcome to the Piazza!
     <ul>
       {% for post in filter %}
       <div class= "individualPost" style="border: thin solid black">
-      <div class="topPart"><p>ID:{{post.id}}  Category: {{post.topics}} by {{ post.poster }} at {{ post.timestamp }}<p></div>
+      <div class="topPart"><p>ID:{{post.id}}  Category:{% for topic in post.topics.all %} {{topic.name}} {% endfor %} by {{ post.poster }} at {{ post.timestamp }}<p></div>
       <section><div class="postTitle">{{ post.title }}</div>
         <p>{{post.body}}</p>
-        {% for topic in post.topics.all %} <br/>{{topic.name}}<br/>{% endfor %}
+      
+        {% if not liked %}  <form method="get">
+        <button type="submit" class="button" name="like" value="{{ post.id }}">
+          Like
+        </button>
+        {% else %} <form method="get">
+        <button type="submit" class="button" name="dontLike" value="{{ post.id }}">
+          Liked
+        </button>
+      </form>
+        {% endif %}
+        {% if not disliked %}  <form method="get">
+        <button type="submit" class="button" name="dislike" value="{{ post.id }}">
+          Dislike
+        </button>
+        {% else %} <form method="get">
+          <button type="submit" class="button" name="dontDislike" value="{{ post.id }}">
+            Disliked
+          </button>
+      </form>
+      {% endif %}
+      </li><br />
         <div class="lowerPart"><p>Likes:{{post.likes}}  Dislikes:{{post.dislikes}}  Status:{{post.status}}  Expire time:{{ post.extimestamp }}<p></div>
         </section>
     </div>

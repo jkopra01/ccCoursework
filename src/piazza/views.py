@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from .serializers import PostSerializer
 from .models import Post,Topic
 from .forms import CreatePost
+from django.db.models import F
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -22,8 +23,29 @@ class PostView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        liked = False
+        disliked = False
         context['topics'] = Topic.objects.all()
         topic = self.request.GET.get('topic')
+        likes = self.request.GET.get('like')
+        dislikes = self.request.GET.get('dislike')
+        dontLike = self.request.GET.get('dontLike')
+        dontDislike = self.request.GET.get('dontDislike')
+        if likes:
+            Post.objects.filter(id=likes).update(likes=F('likes') + 1)
+            liked = True
+        if dontLike:
+            Post.objects.filter(id=dontLike).update(likes=F('likes') - 1)
+            liked = False
+        if dislikes:
+            Post.objects.filter(id=dislikes).update(dislikes=F('dislikes') + 1)
+            disliked = True
+        if dontDislike:
+            Post.objects.filter(id=dontDislike).update(dislikes=F('dislikes') - 1)
+            disliked = False
+
+        context['liked'] = liked
+        context['disliked'] = disliked
         context['filter'] = Post.objects.all()
         if topic:
             context['filter'] = Post.objects.filter(topics=topic)
