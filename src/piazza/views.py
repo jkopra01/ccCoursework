@@ -8,7 +8,7 @@ from datetime import timedelta,datetime
 from rest_framework import viewsets
 from .serializers import PostSerializer
 from .models import Post,Topic
-from .forms import CreatePost
+from .forms import CreatePost,CreateComment
 from django.db.models import F
 
 
@@ -70,7 +70,7 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('/')
+            return redirect('/posts/')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
@@ -85,7 +85,29 @@ def createPost(request):
             post.poster = request.user
             post.save()
             form.save_m2m() 
-            return redirect('/')
+            return redirect('/posts/')
     else:
         form = CreatePost()
     return render(request, 'createpost.html', {'form': form})
+
+
+def comment(request):
+    if request.method == "POST":
+        postId = request.GET.get('comment')
+        post = Post.objects.get(id=postId)
+        form = CreateComment(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.commenter = request.user
+            postId = request.GET.get('comment')
+            
+           # context['postToComment'] = Post.objects.get(id=postId)
+            comment.save()
+            form.save_m2m() 
+            post.comments.add(comment)
+            return redirect('/posts/')
+    else:
+        form = CreateComment()
+        postId = request.GET.get('comment')
+        post = Post.objects.get(id=postId)
+    return render(request, 'comment.html', {'form': form, 'post':post})

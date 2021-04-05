@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post,Topic
+from .models import Post,Topic,Comment
 
 topics = Topic.objects.all().values_list('id', 'name').distinct()
 topics_list = []
@@ -12,3 +12,9 @@ class CreatePost(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('title', 'body','topics')
+
+
+class CreateComment(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('body',)

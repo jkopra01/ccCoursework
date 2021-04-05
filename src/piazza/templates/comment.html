@@ -1,0 +1,14 @@
+{% block content %}
+<div class= "individualPost" style="border: thin solid black">
+<div class="topPart"><p>ID:{{post.id}}  Category:{% for topic in post.topics.all %} {{topic.name}} {% endfor %} by {{ post.poster }} at {{ post.timestamp }}<p></div>
+    <section><div class="postTitle">{{ post.title }}</div>
+      <p>{{post.body}}</p>
+    </div>
+<h2>Create comment</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <a href="/posts"><button type="button">Cancel</button></a>
+  <input type="submit" value="Save"/>
+</form>
+{% endblock %}

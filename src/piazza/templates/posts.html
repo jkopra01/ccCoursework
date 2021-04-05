@@ -64,7 +64,15 @@ Hello and Welcome to the Piazza!
         <div class="lowerPart"><p>Likes:{{post.likes}}  Dislikes:{{post.dislikes}}  Status:{{post.status}}  Expire time:{{ post.extimestamp }}<p></div>
         </section>
     </div>
+    <form method="get">
+    <button type="submit" class="button" name="comment" value="{{ post.id }}" formaction="/comment">
+      Comment
+    </button></form>
     <br>
+   
+    <div class="commentSection"><p>Comments: {% for comment in post.comments.all %} Commenter:{{comment.commenter}} at {{comment.timestamp}}<br>{{comment.body}}<p>{% endfor %}</div>
+    </section>
+</div>
       {% endfor %}
     </ul>
   

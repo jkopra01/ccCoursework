@@ -22,6 +22,15 @@ if not check_empty_obj:
      Topic(name="Health")]
 )
 
+
+class Comment(models.Model):
+    commenter = models.CharField(max_length=60)
+    body = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.body
+
+
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
     poster = models.CharField(max_length=60)
@@ -33,6 +42,10 @@ class Post(models.Model):
     status = models.BooleanField(default=True)
     likes = models.PositiveIntegerField(default=0)
     dislikes = models.PositiveIntegerField(default=0)
+    comments = models.ManyToManyField(Comment)
     def __str__(self):
         return self.title
+
+
+
 
