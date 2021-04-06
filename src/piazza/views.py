@@ -7,10 +7,10 @@ from django.views.generic.base import TemplateView
 from datetime import timedelta,datetime
 from rest_framework import viewsets
 from .serializers import PostSerializer
-from .models import Post,Topic
+from .models import Post,Topic,PostAction
 from .forms import CreatePost,CreateComment
 from django.db.models import F
-from django.utils import timezone
+
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -105,16 +105,18 @@ def comment(request):
     if request.method == "POST":
         postId = request.GET.get('comment')
         post = Post.objects.get(id=postId)
+        timeLeft = post.extimestamp-timezone.now()
+        postAction = PostAction.objects.create(action="Commented", user=request.user, timeLeft= timeLeft.seconds//3600, timeLeftMinutes=(timeLeft.seconds//60)%60)
         form = CreateComment(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.commenter = request.user
             postId = request.GET.get('comment')
-            
-           # context['postToComment'] = Post.objects.get(id=postId)
             comment.save()
             form.save_m2m() 
             post.comments.add(comment)
+            post.postActions.add(postAction)
+
             return redirect('/posts/')
     else:
         form = CreateComment()
