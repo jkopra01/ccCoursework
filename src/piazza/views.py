@@ -10,6 +10,7 @@ from .serializers import PostSerializer
 from .models import Post,Topic
 from .forms import CreatePost,CreateComment
 from django.db.models import F
+from django.utils import timezone
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,14 @@ class PostView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        #check post statuses
+        allPosts = Post.objects.all()
+        timeNow = timezone.now() 
+        for post in allPosts:
+            if not post.in_progress:
+                Post.objects.filter(id=post.id).update(status=False)
+
         liked = False
         disliked = False
         context['topics'] = Topic.objects.all()
@@ -47,6 +56,7 @@ class PostView(TemplateView):
         context['liked'] = liked
         context['disliked'] = disliked
         context['filter'] = Post.objects.all()
+
         if topic:
             context['filter'] = Post.objects.filter(topics=topic)
         return context

@@ -39,35 +39,43 @@ Hello and Welcome to the Piazza!
       <div class="topPart"><p>ID:{{post.id}}  Category:{% for topic in post.topics.all %} {{topic.name}} {% endfor %} by {{ post.poster }} at {{ post.timestamp }}<p></div>
       <section><div class="postTitle">{{ post.title }}</div>
         <p>{{post.body}}</p>
-      
-        {% if not liked %}  <form method="get">
-        <button type="submit" class="button" name="like" value="{{ post.id }}">
-          Like
-        </button>
-        {% else %} <form method="get">
-        <button type="submit" class="button" name="dontLike" value="{{ post.id }}">
-          Liked
-        </button>
-      </form>
-        {% endif %}
-        {% if not disliked %}  <form method="get">
-        <button type="submit" class="button" name="dislike" value="{{ post.id }}">
-          Dislike
-        </button>
-        {% else %} <form method="get">
-          <button type="submit" class="button" name="dontDislike" value="{{ post.id }}">
-            Disliked
-          </button>
-      </form>
-      {% endif %}
-      </li><br />
-        <div class="lowerPart"><p>Likes:{{post.likes}}  Dislikes:{{post.dislikes}}  Status:{{post.status}}  Expire time:{{ post.extimestamp }}<p></div>
+        <br />
+        <div class="lowerPart"><p>Likes:{{post.likes}}  Dislikes:{{post.dislikes}}  Status:{% if post.status %}Live {% else %}Expired {% endif %} Expire time:{{ post.extimestamp }}<p></div>
         </section>
     </div>
+    <div class="interactionPart">
+      {% if post.status %}
     <form method="get">
     <button type="submit" class="button" name="comment" value="{{ post.id }}" formaction="/comment">
-      Comment
+      Comment 
     </button></form>
+    {% if not liked %}  <form method="get">
+      <button type="submit" class="button" name="like" value="{{ post.id }}">
+        Like
+      </button>
+      {% else %} <form method="get">
+      <button type="submit" class="button" name="dontLike" value="{{ post.id }}">
+        Liked
+      </button>
+    </form>
+      {% endif %}
+      {% if not disliked %}  <form method="get">
+      <button type="submit" class="button" name="dislike" value="{{ post.id }}">
+        Dislike
+      </button>
+      {% else %} <form method="get">
+        <button type="submit" class="button" name="dontDislike" value="{{ post.id }}">
+          Disliked
+        </button>
+    </form>
+    {% endif %}
+    {% else %} <form method="get">
+      <button type="submit" class="button" name="postHistory" value="{{ post.id }}">
+        Post History
+      </button>
+    </li>
+    {% endif %}
+    </div>
     <br>
    
     <div class="commentSection"><p>Comments: {% for comment in post.comments.all %} Commenter:{{comment.commenter}} at {{comment.timestamp}}<br>{{comment.body}}<p>{% endfor %}</div>

@@ -43,6 +43,11 @@ class Post(models.Model):
     likes = models.PositiveIntegerField(default=0)
     dislikes = models.PositiveIntegerField(default=0)
     comments = models.ManyToManyField(Comment)
+
+    @property
+    def in_progress(self):
+        return self.extimestamp > timezone.now()
+    
     def __str__(self):
         return self.title
 
