@@ -4,14 +4,13 @@ from django.contrib.auth import login, authenticate
 from django.utils import timezone
 from django.template import RequestContext
 from django.views.generic.base import TemplateView
+from django.shortcuts import get_object_or_404
 from datetime import timedelta,datetime
 from rest_framework import viewsets
 from .serializers import PostSerializer
 from .models import Post,Topic,PostAction
 from .forms import CreatePost,CreateComment
 from django.db.models import F
-
-
 
 class PostViewSet(viewsets.ModelViewSet):
  queryset = Post.objects.all().order_by('title')
@@ -21,7 +20,6 @@ class PostViewSet(viewsets.ModelViewSet):
 class PostView(TemplateView):
     template_name = "posts.html"
 
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -32,35 +30,50 @@ class PostView(TemplateView):
             if not post.in_progress:
                 Post.objects.filter(id=post.id).update(status=False)
 
-        liked = False
-        disliked = False
-        context['topics'] = Topic.objects.all()
         topic = self.request.GET.get('topic')
         likes = self.request.GET.get('like')
         dislikes = self.request.GET.get('dislike')
         dontLike = self.request.GET.get('dontLike')
         dontDislike = self.request.GET.get('dontDislike')
-        if likes:
-            Post.objects.filter(id=likes).update(likes=F('likes') + 1)
-            liked = True
-        if dontLike:
-            Post.objects.filter(id=dontLike).update(likes=F('likes') - 1)
-            liked = False
-        if dislikes:
-            Post.objects.filter(id=dislikes).update(dislikes=F('dislikes') + 1)
-            disliked = True
-        if dontDislike:
-            Post.objects.filter(id=dontDislike).update(dislikes=F('dislikes') - 1)
-            disliked = False
 
-        context['liked'] = liked
-        context['disliked'] = disliked
+        user = self.request.user
+
+        #get posts liked and disliked by the user
+        likedPosts = Post.objects.filter(postActions__action="Liked", postActions__user = user).values_list('id', flat=True)
+        dislikedPosts = Post.objects.filter(postActions__action="Disliked", postActions__user = user).values_list('id', flat=True)
+        
+
+        if likes:
+                Post.objects.filter(id=likes).update(likes=F('likes') + 1)
+                timeLeft =  Post.objects.get(id=likes).extimestamp-timezone.now()
+                postAction = PostAction.objects.create(action="Liked", user=user, timeLeft= timeLeft.seconds//3600, timeLeftMinutes=(timeLeft.seconds//60)%60)
+                post.postActions.add(postAction)
+        if dontLike:
+                Post.objects.filter(id=dontLike).update(likes=F('likes') - 1)
+                postAction = get_object_or_404(PostAction, post=dontLike, user=user, action="Liked")
+                Post.objects.get(id=dontLike).postActions.remove(postAction)
+        if dislikes:
+                Post.objects.filter(id=dislikes).update(dislikes=F('dislikes') + 1)
+                timeLeft =  Post.objects.get(id=dislikes).extimestamp-timezone.now()
+                postAction = PostAction.objects.create(action="Disliked", user=user, timeLeft= timeLeft.seconds//3600, timeLeftMinutes=(timeLeft.seconds//60)%60)
+                post.postActions.add(postAction)
+        if dontDislike:
+                Post.objects.filter(id=dontDislike).update(dislikes=F('dislikes') - 1)
+                postAction =  get_object_or_404(PostAction, post=dontDislike, user=user, action="Disliked")
+                Post.objects.get(id=dontDislike).postActions.remove(postAction)
+
+
+        #save variables for html
+        context['likedPosts'] = likedPosts
+        context['dislikedPosts'] = dislikedPosts
+        context['username'] = user.username
         context['filter'] = Post.objects.all()
+        context['topics'] = Topic.objects.all()
 
         if topic:
             context['filter'] = Post.objects.filter(topics=topic)
         return context
-
+    
 
 @login_required
 def start(request):

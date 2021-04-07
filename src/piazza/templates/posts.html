@@ -49,7 +49,8 @@ Hello and Welcome to the Piazza!
     <button type="submit" class="button" name="comment" value="{{ post.id }}" formaction="/comment">
       Comment 
     </button></form>
-    {% if not liked %}  <form method="get">
+    {% if post.poster != username %}
+    {% if not post.id in likedPosts %}  <form method="get">
       <button type="submit" class="button" name="like" value="{{ post.id }}">
         Like
       </button>
@@ -59,7 +60,7 @@ Hello and Welcome to the Piazza!
       </button>
     </form>
       {% endif %}
-      {% if not disliked %}  <form method="get">
+      {% if not post.id in dislikedPosts %}  <form method="get">
       <button type="submit" class="button" name="dislike" value="{{ post.id }}">
         Dislike
       </button>
@@ -69,13 +70,14 @@ Hello and Welcome to the Piazza!
         </button>
     </form>
     {% endif %}
+    {% endif %}
     </li>
     {% endif %}
     </div>
     <br>
    
-    <div class="commentSection"><p>Comments: {% for comment in post.comments.all %} Commenter:{{comment.commenter}} at {{comment.timestamp}}<br>{{comment.body}}<p>{% endfor %}</div>
-      <div class="posthistorySection" style="border: thin solid black"><p>Post history: {% for postaction in post.postActions.all %} Commenter:{{postaction.user}} did {{postaction.action}} at {{postaction.timestamp}} while there was {{postaction.timeLeft}} hours and {{postaction.timeLeftMinutes}} minutes left <br>{% endfor %}</div>
+    <div class="commentSection"><p> Comments: {% for comment in post.comments.all %} Commenter:{{comment.commenter}} at {{comment.timestamp}}<br>{{comment.body}}<p>{% endfor %}</div>
+      <div class="posthistorySection" style="border: thin solid black"><p>Post history: {% for postaction in post.postActions.all %} User {{postaction.user}} {{postaction.action}} at {{postaction.timestamp}} while there was {{postaction.timeLeft}} hours and {{postaction.timeLeftMinutes}} minutes left <br>{% endfor %}</div>
     </section>
     <br>
     <br>
