@@ -67,11 +67,12 @@ class PostView(TemplateView):
         context['likedPosts'] = likedPosts
         context['dislikedPosts'] = dislikedPosts
         context['username'] = user.username
-        context['filter'] = Post.objects.all()
+        context['filter'] = Post.objects.annotate(fieldsum=F('dislikes') + F('likes')).order_by('-fieldsum')
         context['topics'] = Topic.objects.all()
 
         if topic:
-            context['filter'] = Post.objects.filter(topics=topic)
+            posts = Post.objects.filter(topics=topic)
+            context['filter'] = posts.annotate(fieldsum=F('dislikes') + F('likes')).order_by('-fieldsum')
         return context
     
 
