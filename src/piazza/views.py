@@ -31,6 +31,7 @@ class PostView(TemplateView):
                 Post.objects.filter(id=post.id).update(status=False)
 
         topic = self.request.GET.get('topic')
+        expiredTopic = self.request.GET.get('expiredTopic')
         likes = self.request.GET.get('like')
         dislikes = self.request.GET.get('dislike')
         dontLike = self.request.GET.get('dontLike')
@@ -67,12 +68,18 @@ class PostView(TemplateView):
         context['likedPosts'] = likedPosts
         context['dislikedPosts'] = dislikedPosts
         context['username'] = user.username
-        context['filter'] = Post.objects.annotate(fieldsum=F('dislikes') + F('likes')).order_by('-fieldsum')
+        context['filter'] = Post.objects.all().order_by('-timestamp')
         context['topics'] = Topic.objects.all()
 
         if topic:
+            context['test'] = topic
             posts = Post.objects.filter(topics=topic)
             context['filter'] = posts.annotate(fieldsum=F('dislikes') + F('likes')).order_by('-fieldsum')
+        elif expiredTopic:
+            context['test'] = expiredTopic
+            posts = Post.objects.filter(topics=expiredTopic, status=False)
+            context['filter'] = posts.annotate(fieldsum=F('dislikes') + F('likes')).order_by('-fieldsum')
+        
         return context
     
 

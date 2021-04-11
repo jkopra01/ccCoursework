@@ -19,13 +19,18 @@ Hello and Welcome to the Piazza!
   <ul>
     <li>
       <button type="submit" class="button" name="topic" value="" selected>
-        All Genres
+        All Posts
       </button>
     </li>
     {% for topic in topics %}
     <li>
       <button type="submit" class="button" name="topic" value="{{ topic.id }}">
-        {{ topic.name }}
+        Most popular in {{ topic.name }}
+      </button>
+    </li>
+    <li>
+      <button type="submit" class="button" name="expiredTopic" value="{{ topic.id }}">
+       Expired posts in {{ topic.name }}
       </button>
     </li>
     {% endfor %}
