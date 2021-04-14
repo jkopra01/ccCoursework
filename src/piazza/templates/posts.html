@@ -36,16 +36,15 @@ Hello and Welcome to the Piazza!
     {% endfor %}
   </ul>
 </form>
-
 <div class="post">
     <ul>
       {% for post in filter %}
       <div class= "individualPost" style="border: thin solid black">
-      <div class="topPart"><p>ID:{{post.id}}  Category:{% for topic in post.topics.all %} {{topic.name}} {% endfor %} by {{ post.poster }} at {{ post.timestamp }}<p></div>
+      <div class="topPart">ID:<p class=postID style="display:inline">{{post.id}}</p>  Category:{% for topic in post.topics.all %} {{topic.name}} {% endfor %} by <p class=poster style="display:inline">{{ post.poster }}</p> at {{ post.timestamp }}<p></div>
       <section><div class="postTitle">{{ post.title }}</div>
         <p>{{post.body}}</p>
         <br />
-        <div class="lowerPart"><p>Likes:{{post.likes}}  Dislikes:{{post.dislikes}}  Status:{% if post.status %}Live {% else %}Expired {% endif %} Expire time:{{ post.extimestamp }}<p></div>
+        <div class="lowerPart ">Likes:<p class=likeAmount style="display:inline">{{post.likes}}</p> Dislikes:<p class=dislikeAmount style="display:inline">{{post.dislikes}}</p>  Status:{% if post.status %}Live {% else %}Expired {% endif %} Expire time:{{ post.extimestamp }}<p></div>
         </section>
     </div>
     <div class="interactionPart">
@@ -81,7 +80,7 @@ Hello and Welcome to the Piazza!
     </div>
     <br>
    
-    <div class="commentSection"><p> Comments: {% for comment in post.comments.all %} Commenter:{{comment.commenter}} at {{comment.timestamp}}<br>{{comment.body}}<p>{% endfor %}</div>
+    <div class="commentSection"><p> Comments: <div class="individualComment">  {% for comment in post.comments.all %} Commenter:{{comment.commenter}} at {{comment.timestamp}}<br><p class="commentbody">{{comment.body}}</p></div>{% endfor %}</div>
       <div class="posthistorySection" style="border: thin solid black"><p>Post history: {% for postaction in post.postActions.all %} User {{postaction.user}} {{postaction.action}} at {{postaction.timestamp}} while there was {{postaction.timeLeft}} hours and {{postaction.timeLeftMinutes}} minutes left <br>{% endfor %}</div>
     </section>
     <br>

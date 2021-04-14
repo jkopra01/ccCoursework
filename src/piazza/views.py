@@ -11,6 +11,7 @@ from .serializers import PostSerializer
 from .models import Post,Topic,PostAction
 from .forms import CreatePost,CreateComment
 from django.db.models import F
+from django.views.decorators.csrf import csrf_exempt
 
 class PostViewSet(viewsets.ModelViewSet):
  queryset = Post.objects.all().order_by('title')
@@ -20,6 +21,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class PostView(TemplateView):
     template_name = "posts.html"
 
+    @csrf_exempt
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -42,9 +44,9 @@ class PostView(TemplateView):
         #get posts liked and disliked by the user
         likedPosts = Post.objects.filter(postActions__action="Liked", postActions__user = user).values_list('id', flat=True)
         dislikedPosts = Post.objects.filter(postActions__action="Disliked", postActions__user = user).values_list('id', flat=True)
-        
-
-        if likes:
+        usersPosts = Post.objects.filter(poster=user.username).values_list('id', flat=True)
+        userPostsList = list(usersPosts)
+        if likes and int(likes) not in userPostsList:
                 Post.objects.filter(id=likes).update(likes=F('likes') + 1)
                 timeLeft =  Post.objects.get(id=likes).extimestamp-timezone.now()
                 postAction = PostAction.objects.create(action="Liked", user=user, timeLeft= timeLeft.seconds//3600, timeLeftMinutes=(timeLeft.seconds//60)%60)
@@ -53,7 +55,7 @@ class PostView(TemplateView):
                 Post.objects.filter(id=dontLike).update(likes=F('likes') - 1)
                 postAction = get_object_or_404(PostAction, post=dontLike, user=user, action="Liked")
                 Post.objects.get(id=dontLike).postActions.remove(postAction)
-        if dislikes:
+        if dislikes and int(dislikes) not in userPostsList:
                 Post.objects.filter(id=dislikes).update(dislikes=F('dislikes') + 1)
                 timeLeft =  Post.objects.get(id=dislikes).extimestamp-timezone.now()
                 postAction = PostAction.objects.create(action="Disliked", user=user, timeLeft= timeLeft.seconds//3600, timeLeftMinutes=(timeLeft.seconds//60)%60)
@@ -82,7 +84,7 @@ class PostView(TemplateView):
         
         return context
     
-
+@csrf_exempt
 @login_required
 def start(request):
     latest_post_list = Post.objects.all().order_by('-timestamp')
@@ -91,7 +93,7 @@ def start(request):
     context = {'latest_post_list':latest_post_list}
     return render(request, 'index.html', context)
 
-
+@csrf_exempt
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -108,6 +110,7 @@ def signup(request):
 
 
 #creates post and saves many to many relationship
+@csrf_exempt
 def createPost(request):
     if request.method == "POST":
         form = CreatePost(request.POST)
@@ -121,7 +124,7 @@ def createPost(request):
         form = CreatePost()
     return render(request, 'createpost.html', {'form': form})
 
-
+@csrf_exempt
 def comment(request):
     if request.method == "POST":
         postId = request.GET.get('comment')
