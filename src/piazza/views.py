@@ -46,21 +46,23 @@ class PostView(TemplateView):
         dislikedPosts = Post.objects.filter(postActions__action="Disliked", postActions__user = user).values_list('id', flat=True)
         usersPosts = Post.objects.filter(poster=user.username).values_list('id', flat=True)
         userPostsList = list(usersPosts)
-        if likes and int(likes) not in userPostsList:
+        expiredPosts = Post.objects.filter(status=False).values_list('id', flat=True)
+        expiredPostsList = list(expiredPosts)
+        if likes and int(likes) not in userPostsList and int(likes) not in expiredPostsList:
                 Post.objects.filter(id=likes).update(likes=F('likes') + 1)
                 timeLeft =  Post.objects.get(id=likes).extimestamp-timezone.now()
                 postAction = PostAction.objects.create(action="Liked", user=user, timeLeft= timeLeft.seconds//3600, timeLeftMinutes=(timeLeft.seconds//60)%60)
                 post.postActions.add(postAction)
-        if dontLike:
+        if dontLike and int(dontLike) not in expiredPostsList:
                 Post.objects.filter(id=dontLike).update(likes=F('likes') - 1)
                 postAction = get_object_or_404(PostAction, post=dontLike, user=user, action="Liked")
                 Post.objects.get(id=dontLike).postActions.remove(postAction)
-        if dislikes and int(dislikes) not in userPostsList:
+        if dislikes and int(dislikes) not in userPostsList and int(dislikes) not in expiredPostsList:
                 Post.objects.filter(id=dislikes).update(dislikes=F('dislikes') + 1)
                 timeLeft =  Post.objects.get(id=dislikes).extimestamp-timezone.now()
                 postAction = PostAction.objects.create(action="Disliked", user=user, timeLeft= timeLeft.seconds//3600, timeLeftMinutes=(timeLeft.seconds//60)%60)
                 post.postActions.add(postAction)
-        if dontDislike:
+        if dontDislike and int(dontDislike) not in expiredPostsList:
                 Post.objects.filter(id=dontDislike).update(dislikes=F('dislikes') - 1)
                 postAction =  get_object_or_404(PostAction, post=dontDislike, user=user, action="Disliked")
                 Post.objects.get(id=dontDislike).postActions.remove(postAction)
