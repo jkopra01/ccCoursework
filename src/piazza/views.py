@@ -16,7 +16,6 @@ from django.views.decorators.csrf import csrf_exempt
 class PostView(TemplateView):
     template_name = "posts.html"
 
-    @csrf_exempt
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
