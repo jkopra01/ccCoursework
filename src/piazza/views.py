@@ -18,7 +18,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('title')
     serializer_class = PostSerializer
 
-
+#main posts view
 class PostView(TemplateView):
     template_name = "posts.html"
 
@@ -39,7 +39,7 @@ class PostView(TemplateView):
         allPosts = Post.objects.all()
         timeNow = timezone.now()
         for post in allPosts:
-            if not post.in_progress:
+            if not post.is_live:
                 Post.objects.filter(id=post.id).update(status=False)
 
         # get posts liked and disliked by the user
@@ -54,6 +54,7 @@ class PostView(TemplateView):
         userPostsList = list(usersPosts)
         expiredPostsList = list(expiredPosts)
         
+        #check and do get request
         if likes and int(likes) not in userPostsList and int(likes) not in expiredPostsList:
             Post.objects.filter(id=likes).update(likes=F('likes') + 1)
             timeLeft = Post.objects.get(id=likes).extimestamp-timezone.now()
@@ -106,7 +107,7 @@ def start(request):
     context = {'latest_post_list': latest_post_list}
     return render(request, 'index.html', context)
 
-
+#register user
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -136,7 +137,7 @@ def createPost(request):
         form = CreatePost()
     return render(request, 'createpost.html', {'form': form})
 
-
+#create a comment
 def comment(request):
     if request.method == "POST":
         postId = request.GET.get('comment')

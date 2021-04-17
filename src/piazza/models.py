@@ -61,7 +61,7 @@ class Post(models.Model):
     postActions = models.ManyToManyField(PostAction)
 
     @property
-    def in_progress(self):
+    def is_live(self):
         return self.extimestamp > timezone.now()
 
     def __str__(self):
