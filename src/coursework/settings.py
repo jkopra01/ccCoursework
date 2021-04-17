@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'piazza',
     'oauth2_provider',
     'rest_framework',
-    'users',
 ]
 
 MIDDLEWARE = [
@@ -140,6 +139,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/posts/'
 
 LOGIN_URL = '/accounts/login/'

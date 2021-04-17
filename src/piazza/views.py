@@ -7,16 +7,10 @@ from django.views.generic.base import TemplateView
 from django.shortcuts import get_object_or_404
 from datetime import timedelta, datetime
 from rest_framework import viewsets
-from .serializers import PostSerializer
 from .models import Post, Topic, PostAction
 from .forms import CreatePost, CreateComment
 from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
-
-
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all().order_by('title')
-    serializer_class = PostSerializer
 
 #main posts view
 class PostView(TemplateView):
