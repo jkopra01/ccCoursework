@@ -25,13 +25,6 @@ class PostView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        #check post statuses
-        allPosts = Post.objects.all()
-        timeNow = timezone.now() 
-        for post in allPosts:
-            if not post.in_progress:
-                Post.objects.filter(id=post.id).update(status=False)
-
         topic = self.request.GET.get('topic')
         expiredTopic = self.request.GET.get('expiredTopic')
         likes = self.request.GET.get('like')
@@ -41,12 +34,21 @@ class PostView(TemplateView):
 
         user = self.request.user
 
+        #check post statuses
+        allPosts = Post.objects.all()
+        timeNow = timezone.now() 
+        for post in allPosts:
+            if not post.in_progress:
+                Post.objects.filter(id=post.id).update(status=False)
+
+
+
         #get posts liked and disliked by the user
         likedPosts = Post.objects.filter(postActions__action="Liked", postActions__user = user).values_list('id', flat=True)
         dislikedPosts = Post.objects.filter(postActions__action="Disliked", postActions__user = user).values_list('id', flat=True)
         usersPosts = Post.objects.filter(poster=user.username).values_list('id', flat=True)
-        userPostsList = list(usersPosts)
         expiredPosts = Post.objects.filter(status=False).values_list('id', flat=True)
+        userPostsList = list(usersPosts)
         expiredPostsList = list(expiredPosts)
         if likes and int(likes) not in userPostsList and int(likes) not in expiredPostsList:
                 Post.objects.filter(id=likes).update(likes=F('likes') + 1)
@@ -76,17 +78,15 @@ class PostView(TemplateView):
         context['topics'] = Topic.objects.all()
 
         if topic:
-            context['test'] = topic
-            posts = Post.objects.filter(topics=topic)
+            posts = Post.objects.filter(topics=topic, status=True)
             context['filter'] = posts.annotate(fieldsum=F('dislikes') + F('likes')).order_by('-fieldsum')
         elif expiredTopic:
-            context['test'] = expiredTopic
             posts = Post.objects.filter(topics=expiredTopic, status=False)
             context['filter'] = posts.annotate(fieldsum=F('dislikes') + F('likes')).order_by('-fieldsum')
         
         return context
     
-@csrf_exempt
+
 @login_required
 def start(request):
     latest_post_list = Post.objects.all().order_by('-timestamp')
@@ -95,7 +95,6 @@ def start(request):
     context = {'latest_post_list':latest_post_list}
     return render(request, 'index.html', context)
 
-@csrf_exempt
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -112,7 +111,6 @@ def signup(request):
 
 
 #creates post and saves many to many relationship
-@csrf_exempt
 def createPost(request):
     if request.method == "POST":
         form = CreatePost(request.POST)
@@ -126,7 +124,6 @@ def createPost(request):
         form = CreatePost()
     return render(request, 'createpost.html', {'form': form})
 
-@csrf_exempt
 def comment(request):
     if request.method == "POST":
         postId = request.GET.get('comment')
